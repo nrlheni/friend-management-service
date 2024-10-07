@@ -151,7 +151,7 @@ func (service *FriendServiceImpl) GetMutualFriendsList(dto friend_dto.MutualFrie
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Println(friends)
 	list := friend_dto.FriendListResponse{
 		Friends: friends,
 	}
