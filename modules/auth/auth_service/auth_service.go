@@ -7,4 +7,5 @@ import (
 type AuthService interface {
 	Register(registerRequest auth_dto.RegisterRequest) (*auth_dto.SuccessfullResponse, error)
 	Login(loginRequest auth_dto.LoginRequest) (*auth_dto.LoginResponse, error)
+	GetAllUsers(email string) ([]auth_dto.UsersResponse, error)
 }

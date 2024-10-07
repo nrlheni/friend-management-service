@@ -7,7 +7,9 @@ import (
 	"friends-management-api/modules/friend/friend_dto"
 	"friends-management-api/modules/friend/friend_model"
 	"friends-management-api/modules/friend/friend_repository"
-	"time"
+	"strings"
+
+	"gorm.io/gorm"
 )
 
 type FriendServiceImpl struct {
@@ -26,20 +28,25 @@ func New(
 }
 
 func (service *FriendServiceImpl) CreateFriendRequest(dto friend_dto.FriendRequestAction) (*friend_dto.SuccessfullResponse, error) {
-	requester, err := service.AuthRepository.FindByEmail(dto.Requestor)
+	requester, err := service.AuthRepository.FindByEmail(dto.Requester)
 	if err != nil {
-		return nil, errors.New(constants.UserNotFound)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(constants.UserNotFound)
+		}
+		return nil, err
 	}
 
 	requestee, err := service.AuthRepository.FindByEmail(dto.To)
 	if err != nil {
-		return nil, errors.New(constants.UserNotFound)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(constants.UserNotFound)
+		}
+		return nil, err
 	}
 
 	friendRequest := friend_model.FriendRequests{
 		RequesterID: requester.ID,
 		RequesteeID: requestee.ID,
-		CreatedAt: time.Now(),
 	}
 
 	_, err = service.FriendRepository.CreateFriendRequest(friendRequest)
@@ -54,7 +61,7 @@ func (service *FriendServiceImpl) CreateFriendRequest(dto friend_dto.FriendReque
 	return &response, nil
 }
 
-func (service *FriendServiceImpl) GetFriendRequestList(dto friend_dto.FriendListRequest) (*friend_dto.FriendRequestListResponse, error) {
+func (service *FriendServiceImpl) GetFriendRequestList(dto friend_dto.ListRequest) (*friend_dto.FriendRequestListResponse, error) {
 	friendRequests, err := service.FriendRepository.GetFriendRequestsByEmail(dto.Email)
 	if err != nil {
 		return nil, err
@@ -69,7 +76,7 @@ func (service *FriendServiceImpl) GetFriendRequestList(dto friend_dto.FriendList
 	return &list, nil
 }
 
-func (service *FriendServiceImpl) GetFriendsList(dto friend_dto.FriendListRequest) (*friend_dto.FriendListResponse, error) {
+func (service *FriendServiceImpl) GetFriendsList(dto friend_dto.ListRequest) (*friend_dto.FriendListResponse, error) {
 	friends, err := service.FriendRepository.GetFriendsByEmail(dto.Email)
 	if err != nil {
 		return nil, err
@@ -95,13 +102,74 @@ func (service *FriendServiceImpl) UpdateFriendRequestStatus(dto friend_dto.Updat
 	}
 
 	if dto.Status == "accepted" {
-		friend := friend_model.Friends{
-			UserID:   existingFriendReq.RequesteeID,
-			FriendID: existingFriendReq.RequesterID,
-			CreatedAt: time.Now(),
+		areFriends, err := service.FriendRepository.AreFriends(existingFriendReq.RequesteeID, existingFriendReq.RequesterID)
+		if err != nil {
+			return nil, err
 		}
 
-		_, err := service.FriendRepository.CreateFriend(friend)
+		if !areFriends {
+			friend := friend_model.Friends{
+				UserID:   existingFriendReq.RequesteeID,
+				FriendID: existingFriendReq.RequesterID,
+			}
+
+			_, err := service.FriendRepository.CreateFriend(friend)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	response := friend_dto.SuccessfullResponse{
+		Success: true,
+	}
+
+	return &response, nil
+}
+
+func (service *FriendServiceImpl) GetMutualFriendsList(dto friend_dto.MutualFriendsRequest) (*friend_dto.FriendListResponse, error) {
+	emails := strings.Split(dto.Emails, ",")
+	friends, err := service.FriendRepository.GetMutualFriends(emails[0], emails[1])
+	if err != nil {
+		return nil, err
+	}
+
+	list := friend_dto.FriendListResponse{
+		Friends: friends,
+	}
+
+	return &list, nil
+}
+
+func (service *FriendServiceImpl) BlockFriend(dto friend_dto.BlockFriendRequest) (*friend_dto.SuccessfullResponse, error) {
+	blocker, err := service.AuthRepository.FindByEmail(dto.Requester)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(constants.UserNotFound)
+		}
+		return nil, err
+	}
+
+	blocked, err := service.AuthRepository.FindByEmail(dto.Block)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(constants.UserNotFound)
+		}
+		return nil, err
+	}
+
+	alreadyBlocked, err := service.FriendRepository.AlreadyBlocked(blocker.ID, blocked.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !alreadyBlocked {
+		blockedFriend := friend_model.Blocks{
+			BlockerID: blocker.ID,
+			BlockedID: blocked.ID,
+		}
+
+		_, err := service.FriendRepository.BlockFriend(blockedFriend)
 		if err != nil {
 			return nil, err
 		}
@@ -110,5 +178,23 @@ func (service *FriendServiceImpl) UpdateFriendRequestStatus(dto friend_dto.Updat
 	response := friend_dto.SuccessfullResponse{
 		Success: true,
 	}
+
 	return &response, nil
+}
+
+func (service *FriendServiceImpl) GetBlockedFriends(dto friend_dto.ListRequest) ([]friend_dto.FriendsResult, error) {
+	blocker, err := service.AuthRepository.FindByEmail(dto.Email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New(constants.UserNotFound)
+		}
+		return nil, err
+	}
+
+	blockedUsers, err := service.FriendRepository.GetBlockedFriends(blocker.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return blockedUsers, nil
 }

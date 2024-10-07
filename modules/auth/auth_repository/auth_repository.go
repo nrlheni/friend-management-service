@@ -7,4 +7,5 @@ import (
 type AuthRepository interface {
 	FindByEmail(email string) (*auth_model.User, error)
 	CreateUser(user auth_model.User) (*auth_model.User, error)
+	GetAllUsers(email string) ([]auth_model.User, error)
 }

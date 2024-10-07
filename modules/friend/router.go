@@ -18,11 +18,13 @@ func New(
 }
 
 func (r *Routes) Setup(router *gin.Engine) {
-	authRoutes := router.Group("/friend")
+	friendRoutes := router.Group("/friend")
 	{
-		authRoutes.POST("/request", r.handler.CreateFriendRequest)
-		authRoutes.POST("/request/update", r.handler.UpdateFriendRequestStatus)
-		authRoutes.GET("/request", r.handler.GetFriendRequestList)
-		authRoutes.GET("/", r.handler.GetFriendsList)
+		friendRoutes.POST("/request", r.handler.CreateFriendRequest)
+		friendRoutes.POST("/request/update", r.handler.UpdateFriendRequestStatus)
+		friendRoutes.GET("/request", r.handler.GetFriendRequestList)
+		friendRoutes.GET("/", r.handler.GetFriendsList)
+		friendRoutes.GET("/mutual", r.handler.GetMutualFriendsList)
+		friendRoutes.GET("/block", r.handler.GetBlockedFriendsList)
 	}
 }

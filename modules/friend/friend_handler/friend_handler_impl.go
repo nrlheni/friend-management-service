@@ -1,8 +1,11 @@
 package friend_handler
 
 import (
+	"fmt"
+	"friends-management-api/constants"
 	"friends-management-api/modules/friend/friend_dto"
 	"friends-management-api/modules/friend/friend_service"
+	"friends-management-api/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +32,7 @@ func (handler FriendHandlerImpl) CreateFriendRequest(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, friendRequest)
+	utils.SuccessResponse(c, 200, constants.CreateFriendRequest, friendRequest)
 }
 
 func (handler FriendHandlerImpl) UpdateFriendRequestStatus(c *gin.Context) {
@@ -45,13 +48,13 @@ func (handler FriendHandlerImpl) UpdateFriendRequestStatus(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updatedFriendRequest)
+	utils.SuccessResponse(c, 200, constants.UpdateFriendRequestStatus, updatedFriendRequest)
 }
 
 func (handler FriendHandlerImpl) GetFriendRequestList(c *gin.Context) {
 	email := c.Query("email")
 
-	dto := friend_dto.FriendListRequest{
+	dto := friend_dto.ListRequest{
 		Email: email,
 	}
 
@@ -61,13 +64,13 @@ func (handler FriendHandlerImpl) GetFriendRequestList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, friendRequest)
+	utils.SuccessResponse(c, 200, constants.GetListFriendRequest, friendRequest)
 }
 
 func (handler FriendHandlerImpl) GetFriendsList(c *gin.Context) {
 	email := c.Query("email")
 
-	dto := friend_dto.FriendListRequest{
+	dto := friend_dto.ListRequest{
 		Email: email,
 	}
 
@@ -77,5 +80,39 @@ func (handler FriendHandlerImpl) GetFriendsList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, friends)
+	utils.SuccessResponse(c, 200, constants.GetListFriend, friends)
+}
+
+func (handler FriendHandlerImpl) GetMutualFriendsList(c *gin.Context) {
+	var dto friend_dto.MutualFriendsRequest
+	if err := c.ShouldBindQuery(&dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
+		return
+	}
+
+	fmt.Println(dto);
+
+	friends, err := handler.FriendService.GetMutualFriendsList(dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	utils.SuccessResponse(c, 200, constants.GetListFriend, friends)
+}
+
+func (handler FriendHandlerImpl) GetBlockedFriendsList(c *gin.Context) {
+	email := c.Query("email")
+
+	dto := friend_dto.ListRequest{
+		Email: email,
+	}
+
+	blockedFriends, err := handler.FriendService.GetBlockedFriends(dto)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	utils.SuccessResponse(c, 200, constants.GetBlockedListFriend, blockedFriends)
 }

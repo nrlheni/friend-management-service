@@ -1,11 +1,11 @@
 package friend_dto
 
 type FriendRequestAction struct {
-	Requestor string `json:"requestor" binding:"required,email"`
+	Requester string `json:"requester" binding:"required,email"`
 	To        string `json:"to" binding:"required,email"`
 }
 
-type FriendListRequest struct {
+type ListRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
@@ -15,6 +15,10 @@ type UpdateFriendRequestStatus struct {
 }
 
 type BlockFriendRequest struct {
-	Requestor string `json:"requestor" binding:"required"`
+	Requester string `json:"requester" binding:"required"`
 	Block     string `json:"block" binding:"required,email"`
+}
+
+type MutualFriendsRequest struct {
+	Emails string `form:"emails" binding:"required"`
 }

@@ -15,3 +15,9 @@ type LoginResponse struct {
 type SuccessfullResponse struct {
 	Success bool `json:"success"`
 }
+
+type UsersResponse struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}

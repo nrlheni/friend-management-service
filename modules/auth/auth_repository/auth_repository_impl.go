@@ -30,3 +30,20 @@ func (r *AuthRepositoryImpl) CreateUser(user auth_model.User) (*auth_model.User,
 	}
 	return &user, nil
 }
+
+func (r *AuthRepositoryImpl) GetAllUsers(email string) ([]auth_model.User, error) {
+	users := make([]auth_model.User, 0)
+
+	query := r.DB
+
+	if email != "" {
+		query = query.Where("email LIKE ?", "%"+email+"%")
+	}
+
+	result := query.Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return users, nil
+}

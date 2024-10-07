@@ -69,3 +69,24 @@ func (service *AuthServiceImpl) Login(dto auth_dto.LoginRequest) (*auth_dto.Logi
 
 	return &response, nil
 }
+
+func (service *AuthServiceImpl) GetAllUsers(email string) ([]auth_dto.UsersResponse, error) {
+	users, err := service.AuthRepository.GetAllUsers(email)
+	if err != nil {
+		return nil, err
+	}
+
+	usersResponse := make([]auth_dto.UsersResponse, 0)
+
+	if len(users) > 0 {
+		for _, user := range users {
+			usersResponse = append(usersResponse, auth_dto.UsersResponse{
+				ID:    user.ID,
+				Name:  user.Name,
+				Email: user.Email,
+			})
+		}
+	}
+
+	return usersResponse, nil
+}

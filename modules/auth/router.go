@@ -22,5 +22,6 @@ func (r *Routes) Setup(router *gin.Engine) {
 	{
 		authRoutes.POST("/register", r.handler.Register)
 		authRoutes.POST("/login", r.handler.Login)
+		authRoutes.GET("/users", r.handler.GetAllUsers)
 	}
 }

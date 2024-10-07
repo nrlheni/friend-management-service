@@ -11,7 +11,7 @@ type FriendRequestListResponse struct {
 }
 
 type FriendListResponse struct {
-	Friends []string `json:"friends"`
+	Friends []FriendsResult `json:"friends"`
 }
 
 type FriendRequestResult struct {
@@ -19,4 +19,10 @@ type FriendRequestResult struct {
 	Status         string `json:"status"`
 	RequesterName  string `json:"requesterName"`
 	RequesterEmail string `json:"requesterEmail"`
+}
+
+type FriendsResult struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
