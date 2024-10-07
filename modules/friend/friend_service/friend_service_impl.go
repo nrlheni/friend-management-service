@@ -2,6 +2,7 @@ package friend_service
 
 import (
 	"errors"
+	"fmt"
 	"friends-management-api/constants"
 	"friends-management-api/modules/auth/auth_repository"
 	"friends-management-api/modules/friend/friend_dto"
@@ -66,6 +67,7 @@ func (service *FriendServiceImpl) GetFriendRequestList(dto friend_dto.ListReques
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(friendRequests)
 
 	list := friend_dto.FriendRequestListResponse{
 		Success:  true,
@@ -90,36 +92,52 @@ func (service *FriendServiceImpl) GetFriendsList(dto friend_dto.ListRequest) (*f
 }
 
 func (service *FriendServiceImpl) UpdateFriendRequestStatus(dto friend_dto.UpdateFriendRequestStatus) (*friend_dto.SuccessfullResponse, error) {
+	// Retrieve the existing friend request by ID
 	existingFriendReq, err := service.FriendRepository.GetFriendRequestByID(dto.FriendRequestID)
 	if err != nil {
 		return nil, err
 	}
 
+	// Update the status of the friend request
 	existingFriendReq.Status = dto.Status
 	_, err = service.FriendRepository.UpdateFriendRequestStatus(*existingFriendReq)
 	if err != nil {
 		return nil, err
 	}
 
+	// If the friend request is accepted, check if they are already friends
 	if dto.Status == "accepted" {
 		areFriends, err := service.FriendRepository.AreFriends(existingFriendReq.RequesteeID, existingFriendReq.RequesterID)
 		if err != nil {
 			return nil, err
 		}
 
+		// If they are not already friends, create a bidirectional friendship
 		if !areFriends {
-			friend := friend_model.Friends{
+			friend1 := friend_model.Friends{
 				UserID:   existingFriendReq.RequesteeID,
 				FriendID: existingFriendReq.RequesterID,
 			}
 
-			_, err := service.FriendRepository.CreateFriend(friend)
+			friend2 := friend_model.Friends{
+				UserID:   existingFriendReq.RequesterID,
+				FriendID: existingFriendReq.RequesteeID,
+			}
+
+			// Add both friends (bidirectional relationship)
+			_, err := service.FriendRepository.CreateFriend(friend1)
+			if err != nil {
+				return nil, err
+			}
+
+			_, err = service.FriendRepository.CreateFriend(friend2)
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
 
+	// Return successful response
 	response := friend_dto.SuccessfullResponse{
 		Success: true,
 	}
@@ -170,6 +188,12 @@ func (service *FriendServiceImpl) BlockFriend(dto friend_dto.BlockFriendRequest)
 		}
 
 		_, err := service.FriendRepository.BlockFriend(blockedFriend)
+		if err != nil {
+			return nil, err
+		}
+
+		blocked.IsBlocked = true
+		_, err = service.AuthRepository.UpdateUserStatus(*blocked)
 		if err != nil {
 			return nil, err
 		}

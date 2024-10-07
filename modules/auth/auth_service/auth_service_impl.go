@@ -84,6 +84,7 @@ func (service *AuthServiceImpl) GetAllUsers(email string) ([]auth_dto.UsersRespo
 				ID:    user.ID,
 				Name:  user.Name,
 				Email: user.Email,
+				IsBlocked: user.IsBlocked,
 			})
 		}
 	}

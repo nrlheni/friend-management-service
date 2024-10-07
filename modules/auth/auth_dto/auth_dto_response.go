@@ -17,7 +17,8 @@ type SuccessfullResponse struct {
 }
 
 type UsersResponse struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	IsBlocked bool   `json:"isBlocked"`
 }

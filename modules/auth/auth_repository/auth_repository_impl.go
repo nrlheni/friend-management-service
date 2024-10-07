@@ -47,3 +47,11 @@ func (r *AuthRepositoryImpl) GetAllUsers(email string) ([]auth_model.User, error
 
 	return users, nil
 }
+
+func (r *AuthRepositoryImpl) UpdateUserStatus(user auth_model.User) (*auth_model.User, error) {
+	result := r.DB.Save(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}

@@ -11,4 +11,5 @@ type FriendHandler interface {
 	GetFriendsList(c *gin.Context)
 	GetMutualFriendsList(c *gin.Context)
 	GetBlockedFriendsList(c *gin.Context)
+	BlockFriend(c *gin.Context)
 }

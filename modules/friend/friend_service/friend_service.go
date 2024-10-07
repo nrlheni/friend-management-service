@@ -11,4 +11,5 @@ type FriendService interface {
 	GetFriendsList(dto friend_dto.ListRequest) (*friend_dto.FriendListResponse, error)
 	GetMutualFriendsList(dto friend_dto.MutualFriendsRequest) (*friend_dto.FriendListResponse, error)
 	GetBlockedFriends(dto friend_dto.ListRequest) ([]friend_dto.FriendsResult, error)
+	BlockFriend(dto friend_dto.BlockFriendRequest) (*friend_dto.SuccessfullResponse, error)
 }

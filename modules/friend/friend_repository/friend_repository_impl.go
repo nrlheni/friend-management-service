@@ -122,7 +122,7 @@ func (r *FriendRepositoryImpl) GetMutualFriends(email1, email2 string) ([]friend
 func (r *FriendRepositoryImpl) AreFriends(userID, friendID int) (bool, error) {
 	var count int64
 	result := r.DB.Model(&friend_model.Friends{}).
-		Where("(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)", userID, friendID, friendID, userID).
+		Where("(user_id = ? AND friend_id = ?) AND (user_id = ? AND friend_id = ?)", userID, friendID, friendID, userID).
 		Count(&count)
 
 	if result.Error != nil {

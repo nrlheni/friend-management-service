@@ -26,5 +26,6 @@ func (r *Routes) Setup(router *gin.Engine) {
 		friendRoutes.GET("/", r.handler.GetFriendsList)
 		friendRoutes.GET("/mutual", r.handler.GetMutualFriendsList)
 		friendRoutes.GET("/block", r.handler.GetBlockedFriendsList)
+		friendRoutes.POST("/block", r.handler.BlockFriend)
 	}
 }
