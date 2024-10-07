@@ -17,4 +17,5 @@ type FriendRepository interface {
 	AreFriends(userID, friendID int) (bool, error)
 	AlreadyBlocked(userID, friendID int) (bool, error)
 	GetBlockedFriends(blockerID int) ([]friend_dto.FriendsResult, error)
+	DeleteFriendship(userID, friendID int) error
 }

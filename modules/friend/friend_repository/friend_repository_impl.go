@@ -157,3 +157,13 @@ func (r *FriendRepositoryImpl) GetBlockedFriends(blockerID int) ([]friend_dto.Fr
 	}
 	return blockedUsers, nil
 }
+
+func (r *FriendRepositoryImpl) DeleteFriendship(userID, friendID int) error {
+	result := r.DB.Where("(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)", userID, friendID, friendID, userID).
+		Delete(&friend_model.Friends{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

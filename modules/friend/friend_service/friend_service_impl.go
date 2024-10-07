@@ -197,6 +197,11 @@ func (service *FriendServiceImpl) BlockFriend(dto friend_dto.BlockFriendRequest)
 		if err != nil {
 			return nil, err
 		}
+
+		err = service.FriendRepository.DeleteFriendship(blocker.ID, blocked.ID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	response := friend_dto.SuccessfullResponse{
