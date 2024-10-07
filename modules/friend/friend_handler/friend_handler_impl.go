@@ -1,7 +1,6 @@
 package friend_handler
 
 import (
-	"fmt"
 	"friends-management-api/constants"
 	"friends-management-api/modules/friend/friend_dto"
 	"friends-management-api/modules/friend/friend_service"
@@ -89,8 +88,6 @@ func (handler FriendHandlerImpl) GetMutualFriendsList(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters"})
 		return
 	}
-
-	fmt.Println(dto);
 
 	friends, err := handler.FriendService.GetMutualFriendsList(dto)
 	if err != nil {

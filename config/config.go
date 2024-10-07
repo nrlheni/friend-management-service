@@ -25,24 +25,6 @@ type Config struct {
 	} `yaml:"db"`
 }
 
-// func LoadConfig(configFile string) (*Config, error) {
-// 	config := &Config{}
-
-// 	// Read the file content
-// 	yamlFile, err := os.ReadFile(configFile)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error reading YAML file: %s", err)
-// 	}
-
-// 	// Unmarshal the file content into the config struct
-// 	err = yaml.Unmarshal(yamlFile, config)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("error parsing YAML file: %s", err)
-// 	}
-
-// 	return config, nil
-// }
-
 func NewConfig() *Config {
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(".")

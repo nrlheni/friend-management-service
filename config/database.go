@@ -20,8 +20,6 @@ func ConnectDatabase(cfg *Config) (*gorm.DB, error) {
 		cfg.DB.DbName,
 	)
 
-	fmt.Println(dsn)
-
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err

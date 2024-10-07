@@ -2,7 +2,6 @@ package friend_service
 
 import (
 	"errors"
-	"fmt"
 	"friends-management-api/constants"
 	"friends-management-api/modules/auth/auth_repository"
 	"friends-management-api/modules/friend/friend_dto"
@@ -67,7 +66,6 @@ func (service *FriendServiceImpl) GetFriendRequestList(dto friend_dto.ListReques
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(friendRequests)
 
 	list := friend_dto.FriendRequestListResponse{
 		Success:  true,
@@ -151,7 +149,7 @@ func (service *FriendServiceImpl) GetMutualFriendsList(dto friend_dto.MutualFrie
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(friends)
+
 	list := friend_dto.FriendListResponse{
 		Friends: friends,
 	}
