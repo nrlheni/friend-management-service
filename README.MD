@@ -12,7 +12,7 @@ Follow these steps to set up and run the backend service locally:
 go mod init | go mod tidy
 ```
 ### 2. Config Database
-go to config.yml and update the credential of your database, also make sure the connection of your db
+Replace config.yml.example with config.yaml and fill the credential of your database, also make sure the connection of your db
 
 ### 3. Start Development Server
 
